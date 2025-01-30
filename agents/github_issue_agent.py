@@ -161,42 +161,55 @@ Follow these steps:
 
         # Handle assistant's message
         if message.tool_calls:
-            # Add assistant message with tool calls
+            # Add assistant message with tool calls first
             self.add_to_history(
                 role="assistant",
                 content=None,  # Must be None when using tool calls
-                tool_calls=message.tool_calls
+                tool_calls=[{
+                    "id": tool_call.id,
+                    "type": "function",
+                    "function": {
+                        "name": tool_call.function.name,
+                        "arguments": tool_call.function.arguments
+                    }
+                } for tool_call in message.tool_calls]
             )
 
-            # Process each tool call and store results
-            all_tool_results = []
+            # Process each tool call and add its response immediately
+            error_occurred = False
+            error_message = None
+            
             for tool_call in message.tool_calls:
+                # Execute the tool
                 tool_result = self.execute_tool(tool_call)
-                all_tool_results.append(tool_result)
-
-                # Immediately add the tool response to the conversation history
-                content = str(tool_result["data"]) if tool_result["success"] else f"Error: {tool_result['error']}"
+                
+                # Always add the response to maintain the conversation flow
                 self.add_to_history(
-                    role="tool",
-                    content=content,
+                    role="function",  # Use "function" role directly instead of "tool"
+                    content=str(tool_result["data"]) if tool_result["success"] else f"Error: {tool_result['error']}",
                     tool_call_id=tool_result["tool_call_id"],
                     tool_name=tool_result["name"]
                 )
-
-                # If any tool fails, return the error
+                
+                # Track error but don't return immediately
                 if not tool_result["success"]:
-                    return {
-                        "success": False,
-                        "error": tool_result["error"]
-                    }
-
-            # After all tool calls are processed and responses added to history,
-            # make another LLM call to continue the conversation
+                    error_occurred = True
+                    error_message = tool_result["error"]
+                    break  # Stop processing more tools if one fails
+            
+            # After all responses are added, handle success/failure
+            if error_occurred:
+                return {
+                    "success": False,
+                    "error": error_message
+                }
+            
+            # Continue the conversation
             return self.process({"message": "Continue with the previous request"})
         else:
             # Regular assistant message without tool calls
             self.add_to_history("assistant", message.content)
-
+            
             # Return success response with assistant's message
             return {
                 "success": True,
