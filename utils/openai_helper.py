@@ -17,7 +17,19 @@ def process_issue_description(description):
                     "role": "system",
                     "content": """You are an expert at formatting GitHub issues.
 Given a description, create a well-structured issue with a clear title and detailed markdown-formatted body.
-Include relevant sections like Description, Steps to Reproduce, Expected Behavior, etc. as appropriate.
+Follow this exact structure:
+
+1. Title: Brief, descriptive, and specific
+2. Description: Clear explanation of the current situation
+3. Proposed Feature/Changes: Bullet points of what needs to be implemented
+4. Benefits: List the advantages
+5. Expected Behavior: Numbered steps of how it should work
+6. Additional Information: Any other relevant details
+
+IMPORTANT: 
+- Do not include any external links
+- Do not reference any issues or pull requests
+- Keep all information factual and based only on the provided description
 
 Return a JSON response in exactly this format:
 {
