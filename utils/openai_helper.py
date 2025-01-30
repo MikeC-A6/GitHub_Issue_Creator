@@ -43,3 +43,53 @@ Return a JSON response in exactly this format:
 
     except Exception as e:
         raise Exception(f"Failed to process issue description: {str(e)}")
+
+def generate_github_graphql_query(operation_type, params):
+    """Generate a GitHub GraphQL query using GPT-4o."""
+    try:
+        tools = [{
+            "type": "function",
+            "function": {
+                "name": "create_graphql_query",
+                "description": "Generate a GitHub GraphQL query based on the operation type and parameters",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "The complete GraphQL query string"
+                        },
+                        "variables": {
+                            "type": "object",
+                            "description": "Variables to be used in the query"
+                        }
+                    },
+                    "required": ["query", "variables"]
+                },
+                "strict": True
+            }
+        }]
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": """You are an expert in GitHub's GraphQL API.
+Generate precise and efficient GraphQL queries following GitHub's schema.
+For mutations, always include minimal necessary fields in the response."""
+                },
+                {
+                    "role": "user",
+                    "content": f"Generate a GraphQL query for {operation_type}. Parameters: {json.dumps(params)}"
+                }
+            ],
+            tools=tools,
+            response_format={"type": "json_object"}
+        )
+
+        query_data = json.loads(response.choices[0].message.content)
+        return query_data["query"], query_data["variables"]
+
+    except Exception as e:
+        raise Exception(f"Failed to generate GraphQL query: {str(e)}")
