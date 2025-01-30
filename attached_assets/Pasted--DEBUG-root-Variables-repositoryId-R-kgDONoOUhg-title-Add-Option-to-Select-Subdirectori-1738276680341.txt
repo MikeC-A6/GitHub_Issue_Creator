@@ -1,0 +1,52 @@
+}
+DEBUG:root:Variables: {'repositoryId': 'R_kgDONoOUhg', 'title': 'Add Option to Select Subdirectories Post-Analysis Phase', 'body': '### Description:\nCurrently, users do not have the option to select specific subdirectories to include or exclude after completing the analysis phase. This limits their ability to customize the data set outcomes effectively.\n\n### Proposed Feature/Changes:\n- Implement a UI component that lets users review subdirectory contents post-analysis.\n- Allow users to select specific subdirectories to include in or exclude from further processing.\n- Provide visual indicators of selected vs. deselected subdirectories.\n- Offer a "select all" and "deselect all" option for ease of use.\n\n### Benefits:\n- Increases flexibility and control over analysis results.\n- Facilitates customization of output data sets.\n- Enhances user satisfaction by providing a tailored data processing experience.\n\n### Expected Behavior:\n1. Users complete the analysis phase as usual.\n2. Upon completion, a prompt appears allowing selection/deselection of subdirectories.\n3. Users can select or deselect specific subdirectories as desired.\n4. Changes are visually represented, and a confirmation button is available.\n5. Selected subdirectories are processed while others are ignored in the next phase.\n\n### Additional Information:\n- Ensure the UI is intuitive and maintains a consistent style with the rest of the application.\n- Consider load implications when presenting large numbers of subdirectories.'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.github.com:443
+DEBUG:urllib3.connectionpool:https://api.github.com:443 "POST /graphql HTTP/1.1" 200 None
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 21:46:27] "POST /create_issue HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:02:20] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:17:42] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:35] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:36] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:36] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:36] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:36] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:29:36] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:30:13] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:30:13] "GET /static/js/main.js HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:30:13] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:36:52] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:36:52] "GET /static/css/custom.css HTTP/1.1" 304 -
+INFO:werkzeug:172.31.128.27 - - [30/Jan/2025 22:36:53] "GET /static/js/main.js HTTP/1.1" 304 -
+DEBUG:openai._base_client:Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert at formatting GitHub issues.\nGiven a description, create a well-structured issue with a clear title and detailed markdown-formatted body.\nFollow this exact structure:\n\n1. Title: Brief, descriptive, and specific\n2. Description: Clear explanation of the current situation\n3. Proposed Feature/Changes: Bullet points of what needs to be implemented\n4. Benefits: List the advantages\n5. Expected Behavior: Numbered steps of how it should work\n6. Additional Information: Any other relevant details\n\nIMPORTANT: \n- Do not include any external links\n- Do not reference any issues or pull requests\n- Keep all information factual and based only on the provided description\n\nReturn a JSON response in exactly this format:\n{\n    "title": "Brief, clear issue title",\n    "body": "Full markdown-formatted issue body"\n}'}, {'role': 'user', 'content': 'Create a GitHub issue from this description and format it as JSON: This is a test'}], 'model': 'gpt-4o', 'response_format': {'type': 'json_object'}}}
+DEBUG:openai._base_client:Sending HTTP Request: POST https://api.openai.com/v1/chat/completions
+DEBUG:httpcore.connection:close.started
+DEBUG:httpcore.connection:close.complete
+DEBUG:httpcore.connection:connect_tcp.started host='api.openai.com' port=443 local_address=None timeout=5.0 socket_options=None
+DEBUG:httpcore.connection:connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f6ed87b0890>
+DEBUG:httpcore.connection:start_tls.started ssl_context=<ssl.SSLContext object at 0x7f6ed997b890> server_hostname='api.openai.com' timeout=5.0
+DEBUG:httpcore.connection:start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f6ed87b27d0>
+DEBUG:httpcore.http11:send_request_headers.started request=<Request [b'POST']>
+DEBUG:httpcore.http11:send_request_headers.complete
+DEBUG:httpcore.http11:send_request_body.started request=<Request [b'POST']>
+DEBUG:httpcore.http11:send_request_body.complete
+DEBUG:httpcore.http11:receive_response_headers.started request=<Request [b'POST']>
+DEBUG:httpcore.http11:receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Thu, 30 Jan 2025 22:37:11 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-expose-headers', b'X-Request-ID'), (b'openai-organization', b'user-it1rjsnvsxprd3wbxr1oqmpg'), (b'openai-processing-ms', b'4958'), (b'openai-version', b'2020-10-01'), (b'x-ratelimit-limit-requests', b'500'), (b'x-ratelimit-limit-tokens', b'30000'), (b'x-ratelimit-remaining-requests', b'499'), (b'x-ratelimit-remaining-tokens', b'29756'), (b'x-ratelimit-reset-requests', b'120ms'), (b'x-ratelimit-reset-tokens', b'488ms'), (b'x-request-id', b'req_5982cebde562beda0a00a66c86a1560d'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'cf-cache-status', b'DYNAMIC'), (b'Set-Cookie', b'__cf_bm=MYWo8vdQ_40W8UTuI05gDlcefJIXXUiWFcBrUSYW3vA-1738276631-1.0.1.1-M7TFIxr5HDpnMty9.zSWpLM6IH0Z5IfUojw8NOppUmNAnmong6DxzguVzLcyFIqXSwn_JFkD1E5ZliIFr.MisA; path=/; expires=Thu, 30-Jan-25 23:07:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None'), (b'X-Content-Type-Options', b'nosniff'), (b'Server', b'cloudflare'), (b'CF-RAY', b'90a4f1d18f1ea376-ORD'), (b'Content-Encoding', b'gzip'), (b'alt-svc', b'h3=":443"; ma=86400')])
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+DEBUG:httpcore.http11:receive_response_body.started request=<Request [b'POST']>
+DEBUG:httpcore.http11:receive_response_body.complete
+DEBUG:httpcore.http11:response_closed.started
+DEBUG:httpcore.http11:response_closed.complete
+DEBUG:openai._base_client:HTTP Response: POST https://api.openai.com/v1/chat/completions "200 OK" Headers({'date': 'Thu, 30 Jan 2025 22:37:11 GMT', 'content-type': 'application/json', 'transfer-encoding': 'chunked', 'connection': 'keep-alive', 'access-control-expose-headers': 'X-Request-ID', 'openai-organization': 'user-it1rjsnvsxprd3wbxr1oqmpg', 'openai-processing-ms': '4958', 'openai-version': '2020-10-01', 'x-ratelimit-limit-requests': '500', 'x-ratelimit-limit-tokens': '30000', 'x-ratelimit-remaining-requests': '499', 'x-ratelimit-remaining-tokens': '29756', 'x-ratelimit-reset-requests': '120ms', 'x-ratelimit-reset-tokens': '488ms', 'x-request-id': 'req_5982cebde562beda0a00a66c86a1560d', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'cf-cache-status': 'DYNAMIC', 'set-cookie': '__cf_bm=MYWo8vdQ_40W8UTuI05gDlcefJIXXUiWFcBrUSYW3vA-1738276631-1.0.1.1-M7TFIxr5HDpnMty9.zSWpLM6IH0Z5IfUojw8NOppUmNAnmong6DxzguVzLcyFIqXSwn_JFkD1E5ZliIFr.MisA; path=/; expires=Thu, 30-Jan-25 23:07:11 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None', 'x-content-type-options': 'nosniff', 'server': 'cloudflare', 'cf-ray': '90a4f1d18f1ea376-ORD', 'content-encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'})
+DEBUG:openai._base_client:request_id: req_5982cebde562beda0a00a66c86a1560d
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.github.com:443
+ERROR:app:Error creating issue: Failed to create GitHub issue: 'latin-1' codec can't encode character '\u2028' in position 47: ordinal not in range(256)
