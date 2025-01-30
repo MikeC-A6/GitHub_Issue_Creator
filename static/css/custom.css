@@ -1,0 +1,36 @@
+/* Custom styles to complement Bootstrap dark theme */
+.card {
+    border-color: var(--bs-dark);
+    background-color: var(--bs-dark);
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.alert {
+    display: none;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--bs-dark);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+main {
+    margin-bottom: 100px;
+}

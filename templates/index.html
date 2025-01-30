@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Create GitHub Issue</h4>
+            </div>
+            <div class="card-body">
+                <form id="issueForm">
+                    <div class="mb-3">
+                        <label for="repoUrl" class="form-label">GitHub Repository URL</label>
+                        <input type="url" class="form-control" id="repoUrl" required
+                               placeholder="https://github.com/owner/repository">
+                        <div class="form-text">Enter the full URL of the GitHub repository</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Issue Description</label>
+                        <textarea class="form-control" id="description" rows="6" required
+                                  placeholder="Describe the issue in detail. Our AI will format it appropriately."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="githubToken" class="form-label">GitHub Personal Access Token</label>
+                        <input type="password" class="form-control" id="githubToken" required>
+                        <div class="form-text">
+                            Your token needs permissions for creating issues. It will not be stored.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitButton">
+                        Create Issue
+                    </button>
+                </form>
+
+                <div id="result" class="mt-4" style="display: none;">
+                    <div class="alert" role="alert"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
