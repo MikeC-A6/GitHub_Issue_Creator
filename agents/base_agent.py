@@ -11,13 +11,13 @@ class BaseAgent(ABC):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.conversation_history = []
 
-    def add_to_history(self, role: str, content: str, tool_call_id: Optional[str] = None, tool_calls: Optional[List[Any]] = None, tool_name: Optional[str] = None):
+    def add_to_history(self, role: str, content: Optional[str], tool_call_id: Optional[str] = None, tool_calls: Optional[List[Any]] = None, tool_name: Optional[str] = None):
         """
         Add a message to the conversation history.
 
         Args:
             role: The role of the message sender (system, user, assistant, function)
-            content: The message content
+            content: The message content (can be None for assistant messages with tool calls)
             tool_call_id: For function responses, the ID of the tool call this is responding to
             tool_calls: For assistant messages, the list of tool calls being made
             tool_name: For function responses, the name of the function that was called
@@ -39,7 +39,7 @@ class BaseAgent(ABC):
             # Assistant message with tool calls
             message = {
                 "role": "assistant",
-                "content": content,  # Can be None when using tool calls
+                "content": content,  # Must be None when using tool calls
                 "tool_calls": tool_calls
             }
         else:
@@ -67,7 +67,7 @@ class BaseAgent(ABC):
         """Make a call to the LLM with proper error handling."""
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4",  # Use the default model unless specified otherwise
+                model="gpt-4o",  # Use the latest model
                 messages=messages,
                 tools=tools,
                 tool_choice=tool_choice
@@ -96,5 +96,6 @@ class BaseAgent(ABC):
                 data: The result data if successful
                 error: Error message if unsuccessful
                 name: The name of the tool that was called
+                tool_call_id: The ID of the tool call for proper response tracking
         """
         pass

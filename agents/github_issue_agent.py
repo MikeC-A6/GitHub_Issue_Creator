@@ -111,7 +111,8 @@ class GitHubIssueAgent(BaseAgent):
             return {
                 "success": True,
                 "data": result,
-                "name": name
+                "name": name,
+                "tool_call_id": tool_call.id  # Include the tool call ID for proper response tracking
             }
 
         except Exception as e:
@@ -120,7 +121,8 @@ class GitHubIssueAgent(BaseAgent):
             return {
                 "success": False,
                 "error": error_msg,
-                "name": name if 'name' in locals() else 'unknown'
+                "name": name if 'name' in locals() else 'unknown',
+                "tool_call_id": getattr(tool_call, 'id', None)  # Include the tool call ID even in error case
             }
 
     def process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -171,25 +173,19 @@ Follow these steps:
                 # Execute the tool
                 tool_result = self.execute_tool(tool_call)
 
-                # Add function response to history
-                if tool_result["success"]:
-                    self.add_to_history(
-                        "tool",
-                        str(tool_result["data"]),
-                        tool_call_id=tool_call.id,
-                        tool_name=tool_result["name"]
-                    )
-                else:
-                    error_msg = str(tool_result.get("error", "Unknown error occurred"))
-                    self.add_to_history(
-                        "tool",
-                        f"Error: {error_msg}",
-                        tool_call_id=tool_call.id,
-                        tool_name=tool_result["name"]
-                    )
+                # Add function response to history with the correct tool_call_id
+                content = str(tool_result["data"]) if tool_result["success"] else f"Error: {tool_result['error']}"
+                self.add_to_history(
+                    "tool",
+                    content=content,
+                    tool_call_id=tool_result["tool_call_id"],  # Use the stored tool_call_id
+                    tool_name=tool_result["name"]
+                )
+
+                if not tool_result["success"]:
                     return {
                         "success": False,
-                        "error": error_msg
+                        "error": tool_result["error"]
                     }
 
             # After processing all tool calls, make another LLM call
