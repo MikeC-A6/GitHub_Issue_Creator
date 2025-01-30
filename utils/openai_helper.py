@@ -8,15 +8,25 @@ from openai import OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def process_issue_description(description):
+def process_issue_description(description, code_context=''):
     try:
+        context_prompt = ""
+        if code_context:
+            context_prompt = f"""
+Here is the relevant code context to consider:
+```
+{code_context}
+```
+
+Please use this code context to create a more detailed and specific issue."""
+
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "system",
-                    "content": """You are an expert at formatting GitHub issues.
-Given a description, create a well-structured issue with a clear title and detailed markdown-formatted body.
+                    "content": f"""You are an expert at formatting GitHub issues.
+Given a description and optional code context, create a well-structured issue with a clear title and detailed markdown-formatted body.
 Follow this exact structure:
 
 1. Title: Brief, descriptive, and specific
@@ -29,17 +39,19 @@ Follow this exact structure:
 IMPORTANT: 
 - Do not include any external links
 - Do not reference any issues or pull requests
-- Keep all information factual and based only on the provided description
+- Keep all information factual and based only on the provided description and code context
+- If code context is provided, use it to make the issue more specific and technical
+- Include relevant code snippets from the context if they help explain the issue
 
 Return a JSON response in exactly this format:
-{
+{{
     "title": "Brief, clear issue title",
     "body": "Full markdown-formatted issue body"
-}"""
+}}"""
                 },
                 {
                     "role": "user",
-                    "content": f"Create a GitHub issue from this description and format it as JSON: {description}"
+                    "content": f"Create a GitHub issue from this description and format it as JSON: {description}\n\n{context_prompt}"
                 }
             ],
             response_format={"type": "json_object"}

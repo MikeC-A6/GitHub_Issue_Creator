@@ -6,15 +6,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         // Show loading state
         submitButton.disabled = true;
         submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
-        
+
         // Hide previous results
         resultDiv.style.display = 'none';
-        
+
         try {
+            let codeContext = '';
+            const codebaseFile = document.getElementById('codebaseFile').files[0];
+
+            if (codebaseFile) {
+                codeContext = await codebaseFile.text();
+            }
+
             const response = await fetch('/create_issue', {
                 method: 'POST',
                 headers: {
@@ -23,12 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     repo_url: document.getElementById('repoUrl').value,
                     description: document.getElementById('description').value,
-                    github_token: document.getElementById('githubToken').value
+                    github_token: document.getElementById('githubToken').value,
+                    code_context: codeContext
                 })
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 // Show success message
                 alertDiv.className = 'alert alert-success';

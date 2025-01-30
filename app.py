@@ -22,13 +22,14 @@ def create_issue():
         repo_url = data.get('repo_url')
         description = data.get('description')
         github_token = data.get('github_token')
+        code_context = data.get('code_context', '')
 
         if not all([repo_url, description, github_token]):
             return jsonify({'error': 'Missing required fields'}), 400
 
         # Process the description with GPT-4o
-        processed_issue = process_issue_description(description)
-        
+        processed_issue = process_issue_description(description, code_context)
+
         # Create the issue using GitHub GraphQL API
         result = create_github_issue(
             repo_url=repo_url,
