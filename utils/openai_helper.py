@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from openai import OpenAI
 
 # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
@@ -61,11 +62,29 @@ def generate_github_graphql_query(operation_type, params):
 Generate precise and efficient GraphQL queries following GitHub's schema.
 For mutations, always include minimal necessary fields in the response.{schema_context}
 
-For repository_id_query, include the repository's id.
-For create_issue_mutation, include the new issue's url and number in the response.
+For repository_id_query, generate a query like this:
+query GetRepositoryId($owner: String!, $name: String!) {{
+    repository(owner: $owner, name: $name) {{
+        id
+    }}
+}}
+
+For create_issue_mutation, generate a mutation like this:
+mutation CreateIssue($repositoryId: ID!, $title: String!, $body: String!) {{
+    createIssue(input: {{
+        repositoryId: $repositoryId
+        title: $title
+        body: $body
+    }}) {{
+        issue {{
+            url
+            number
+        }}
+    }}
+}}
 
 Format your response as a JSON object with two fields:
-1. 'query': The complete GraphQL query string
+1. 'query': The complete GraphQL query string (properly formatted with correct indentation)
 2. 'variables': An object containing the variables for the query"""
                 },
                 {
@@ -79,6 +98,11 @@ Format your response as a JSON object with two fields:
         result = json.loads(response.choices[0].message.content)
         if not isinstance(result, dict) or 'query' not in result or 'variables' not in result:
             raise ValueError("Invalid response format from OpenAI")
+
+        # Clean up the query string
+        result['query'] = result['query'].strip()
+        logging.debug(f"Generated GraphQL query: {result['query']}")
+        logging.debug(f"Variables: {result['variables']}")
 
         return result['query'], result['variables']
 
