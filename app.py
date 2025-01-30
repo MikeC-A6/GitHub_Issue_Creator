@@ -1,8 +1,7 @@
 import os
 import logging
 from flask import Flask, render_template, request, jsonify
-from utils.github import create_github_issue
-from utils.openai_helper import process_issue_description
+from agents.github_issue_agent import GitHubIssueAgent
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -11,34 +10,40 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default_secret_key")
 
+# Initialize the GitHub Issue Agent
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is required")
+
+github_issue_agent = GitHubIssueAgent(openai_api_key)
+
 @app.route('/')
 def index():
+    """Render the main page."""
     return render_template('index.html')
 
 @app.route('/create_issue', methods=['POST'])
 def create_issue():
+    """Handle issue creation requests."""
     try:
+        # Validate input
         data = request.json
-        repo_url = data.get('repo_url')
-        description = data.get('description')
-        github_token = data.get('github_token')
-
-        if not all([repo_url, description, github_token]):
+        required_fields = ['repo_url', 'description', 'github_token']
+        if not all(field in data for field in required_fields):
             return jsonify({'error': 'Missing required fields'}), 400
-
-        # Process the description with GPT-4o
-        processed_issue = process_issue_description(description)
+            
+        # Process the request using our agent
+        result = github_issue_agent.process({
+            "description": data['description'],
+            "repo_url": data['repo_url'],
+            "github_token": data['github_token']
+        })
         
-        # Create the issue using GitHub GraphQL API
-        result = create_github_issue(
-            repo_url=repo_url,
-            title=processed_issue['title'],
-            body=processed_issue['body'],
-            token=github_token
-        )
-
+        if not result['success']:
+            return jsonify({'error': result['error']}), 500
+            
         return jsonify(result)
-
+        
     except Exception as e:
         logger.error(f"Error creating issue: {str(e)}")
         return jsonify({'error': str(e)}), 500

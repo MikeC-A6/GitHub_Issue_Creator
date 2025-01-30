@@ -1,0 +1,141 @@
+/* Base styles */
+body {
+    @apply bg-gray-50;
+}
+
+/* Form container */
+.form-container {
+    @apply bg-white rounded-lg shadow-lg;
+}
+
+/* Input styles */
+input[type="text"],
+input[type="password"],
+textarea {
+    @apply border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200;
+}
+
+/* Input icons */
+.input-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400;
+}
+
+/* Enhanced focus states */
+.focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-shadow duration-200;
+}
+
+/* Button styles */
+.btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95;
+}
+
+/* Card styles */
+.card {
+    @apply bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200;
+}
+
+/* Status message styles */
+.status-message {
+    @apply rounded-lg p-4 border transition-all duration-200 ease-in-out transform;
+}
+
+.status-message.info {
+    @apply bg-blue-50 border-blue-200;
+}
+
+.status-message.success {
+    @apply bg-green-50 border-green-200;
+}
+
+.status-message.error {
+    @apply bg-red-50 border-red-200;
+}
+
+/* Custom scrollbar for textareas */
+textarea {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.gray.300') theme('colors.gray.100');
+}
+
+textarea::-webkit-scrollbar {
+    @apply w-2;
+}
+
+textarea::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors duration-200;
+}
+
+/* Form validation styles */
+input:invalid,
+textarea:invalid {
+    @apply border-red-300;
+}
+
+.error-message {
+    @apply mt-1 text-sm text-red-600 transition-all duration-200 ease-in-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Hover effects */
+.hover-scale {
+    @apply transition-transform duration-200 ease-in-out hover:scale-105;
+}
+
+/* Form group spacing */
+.form-group {
+    @apply space-y-1;
+}
+
+.form-group label {
+    @apply block text-sm font-semibold text-gray-700;
+}
+
+.form-group .helper-text {
+    @apply text-xs text-gray-500 mt-1;
+}
+
+/* Transitions */
+.transition-all {
+    @apply transition-all duration-200 ease-in-out;
+}
+
+/* Links */
+a {
+    @apply text-indigo-600 hover:text-indigo-800 transition-colors duration-200;
+}
+
+/* Icons */
+.icon {
+    @apply inline-flex items-center justify-center;
+}
+
+/* Form field focus ring */
+.focus-ring-field {
+    @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+}
+
+/* Success animation */
+@keyframes success-scale {
+    0% { transform: scale(0.95); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.animate-success {
+    animation: success-scale 0.3s ease-in-out;
+} 
