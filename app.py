@@ -2,7 +2,7 @@ import os
 import logging
 from flask import Flask, render_template, request, jsonify
 from utils.github import create_github_issue
-from utils.openai_helper import process_issue_description
+from utils.gemini_helper import process_issue_description
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -27,7 +27,7 @@ def create_issue():
         if not all([repo_url, description, github_token]):
             return jsonify({'error': 'Missing required fields'}), 400
 
-        # Process the description with GPT-4o
+        # Process the description with Gemini
         processed_issue = process_issue_description(description, code_context)
 
         # Create the issue using GitHub GraphQL API
