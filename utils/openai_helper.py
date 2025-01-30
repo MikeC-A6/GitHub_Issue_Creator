@@ -13,17 +13,25 @@ def process_issue_description(description):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert at formatting GitHub issues. "
-                    "Given a description, create a well-structured issue with a "
-                    "clear title and detailed markdown-formatted body. Include "
-                    "relevant sections like Description, Steps to Reproduce, "
-                    "Expected Behavior, etc. as appropriate."
+                    "content": (
+                        "You are an expert at formatting GitHub issues. "
+                        "Given a description, create a well-structured issue with a "
+                        "clear title and detailed markdown-formatted body. Include "
+                        "relevant sections like Description, Steps to Reproduce, "
+                        "Expected Behavior, etc. as appropriate. "
+                        "Return your response as a JSON object with 'title' and 'body' fields."
+                    )
                 },
-                {"role": "user", "content": description}
+                {
+                    "role": "user", 
+                    "content": (
+                        f"Create a GitHub issue from this description and return it as JSON: {description}"
+                    )
+                }
             ],
             response_format={"type": "json_object"}
         )
-        
+
         result = response.choices[0].message.content
         return {
             "title": result["title"],
