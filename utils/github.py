@@ -115,6 +115,7 @@ def create_github_issue(repo_url, title, body, token):
         headers = {
             "Authorization": f"bearer {token}",
             "Content-Type": "application/json",
+            "Accept": "application/json",  # Explicitly request JSON response
         }
 
         # Get repository ID
@@ -132,6 +133,10 @@ def create_github_issue(repo_url, title, body, token):
             raise Exception(repo_data["errors"][0]["message"])
 
         repository_id = repo_data["data"]["repository"]["id"]
+
+        # Clean the title and body to remove problematic Unicode characters
+        title = title.encode('utf-8', errors='replace').decode('utf-8')
+        body = body.encode('utf-8', errors='replace').decode('utf-8')
 
         # Generate the create issue mutation query with schema awareness
         create_query, create_variables = generate_github_graphql_query(
