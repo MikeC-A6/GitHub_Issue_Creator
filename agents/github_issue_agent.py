@@ -163,32 +163,35 @@ Follow these steps:
         if message.tool_calls:
             # Add assistant message with tool calls
             self.add_to_history(
-                "assistant",
-                content=None,
+                role="assistant",
+                content=None,  # Must be None when using tool calls
                 tool_calls=message.tool_calls
             )
 
-            # Process each tool call
+            # Process each tool call and store results
+            all_tool_results = []
             for tool_call in message.tool_calls:
-                # Execute the tool
                 tool_result = self.execute_tool(tool_call)
+                all_tool_results.append(tool_result)
 
-                # Add function response to history with the correct tool_call_id
+                # Immediately add the tool response to the conversation history
                 content = str(tool_result["data"]) if tool_result["success"] else f"Error: {tool_result['error']}"
                 self.add_to_history(
-                    "tool",
+                    role="tool",
                     content=content,
-                    tool_call_id=tool_result["tool_call_id"],  # Use the stored tool_call_id
+                    tool_call_id=tool_result["tool_call_id"],
                     tool_name=tool_result["name"]
                 )
 
+                # If any tool fails, return the error
                 if not tool_result["success"]:
                     return {
                         "success": False,
                         "error": tool_result["error"]
                     }
 
-            # After processing all tool calls, make another LLM call
+            # After all tool calls are processed and responses added to history,
+            # make another LLM call to continue the conversation
             return self.process({"message": "Continue with the previous request"})
         else:
             # Regular assistant message without tool calls

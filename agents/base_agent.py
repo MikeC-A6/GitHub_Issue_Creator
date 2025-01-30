@@ -49,6 +49,7 @@ class BaseAgent(ABC):
                 "content": content
             }
 
+        self.logger.debug(f"Adding message to history: {message}")
         self.conversation_history.append(message)
 
     def clear_history(self):
@@ -66,6 +67,7 @@ class BaseAgent(ABC):
                 tool_choice: str = "auto") -> Dict[str, Any]:
         """Make a call to the LLM with proper error handling."""
         try:
+            self.logger.debug(f"Calling LLM with messages: {messages}")
             response = self.client.chat.completions.create(
                 model="gpt-4o",  # Use the latest model
                 messages=messages,
