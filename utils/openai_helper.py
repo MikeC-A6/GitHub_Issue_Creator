@@ -45,51 +45,42 @@ Return a JSON response in exactly this format:
         raise Exception(f"Failed to process issue description: {str(e)}")
 
 def generate_github_graphql_query(operation_type, params):
-    """Generate a GitHub GraphQL query using GPT-4o."""
+    """Generate a GitHub GraphQL query using GPT-4o with schema awareness."""
     try:
-        tools = [{
-            "type": "function",
-            "function": {
-                "name": "create_graphql_query",
-                "description": "Generate a GitHub GraphQL query based on the operation type and parameters",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "The complete GraphQL query string"
-                        },
-                        "variables": {
-                            "type": "object",
-                            "description": "Variables to be used in the query"
-                        }
-                    },
-                    "required": ["query", "variables"]
-                },
-                "strict": True
-            }
-        }]
+        schema_info = params.pop('schema_info', None)
+        schema_context = ""
+        if schema_info:
+            schema_context = f"\nHere is the relevant schema information:\n{json.dumps(schema_info, indent=2)}"
 
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "system",
-                    "content": """You are an expert in GitHub's GraphQL API.
+                    "content": f"""You are an expert in GitHub's GraphQL API.
 Generate precise and efficient GraphQL queries following GitHub's schema.
-For mutations, always include minimal necessary fields in the response."""
+For mutations, always include minimal necessary fields in the response.{schema_context}
+
+For repository_id_query, include the repository's id.
+For create_issue_mutation, include the new issue's url and number in the response.
+
+Format your response as a JSON object with two fields:
+1. 'query': The complete GraphQL query string
+2. 'variables': An object containing the variables for the query"""
                 },
                 {
                     "role": "user",
                     "content": f"Generate a GraphQL query for {operation_type}. Parameters: {json.dumps(params)}"
                 }
             ],
-            tools=tools,
             response_format={"type": "json_object"}
         )
 
-        query_data = json.loads(response.choices[0].message.content)
-        return query_data["query"], query_data["variables"]
+        result = json.loads(response.choices[0].message.content)
+        if not isinstance(result, dict) or 'query' not in result or 'variables' not in result:
+            raise ValueError("Invalid response format from OpenAI")
+
+        return result['query'], result['variables']
 
     except Exception as e:
         raise Exception(f"Failed to generate GraphQL query: {str(e)}")
