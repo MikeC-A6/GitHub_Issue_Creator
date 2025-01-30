@@ -5,16 +5,16 @@ from abc import ABC, abstractmethod
 
 class BaseAgent(ABC):
     """Base class for all agents in the system."""
-    
+
     def __init__(self, api_key: str):
         self.client = OpenAI(api_key=api_key)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.conversation_history = []
-        
-    def add_to_history(self, role: str, content: str, tool_call_id: Optional[str] = None, tool_calls: Optional[List[Dict]] = None, tool_name: Optional[str] = None):
+
+    def add_to_history(self, role: str, content: str, tool_call_id: Optional[str] = None, tool_calls: Optional[List[Any]] = None, tool_name: Optional[str] = None):
         """
         Add a message to the conversation history.
-        
+
         Args:
             role: The role of the message sender (system, user, assistant, function)
             content: The message content
@@ -39,7 +39,7 @@ class BaseAgent(ABC):
             # Assistant message with tool calls
             message = {
                 "role": "assistant",
-                "content": None,  # Must be null when using tool calls
+                "content": content,  # Can be None when using tool calls
                 "tool_calls": tool_calls
             }
         else:
@@ -48,26 +48,26 @@ class BaseAgent(ABC):
                 "role": role,
                 "content": content
             }
-        
+
         self.conversation_history.append(message)
-        
+
     def clear_history(self):
         """Clear the conversation history."""
         self.conversation_history = []
-        
+
     @abstractmethod
     def process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """Process the input data and return a response."""
         pass
-    
+
     def call_llm(self, 
-                messages: List[Dict[str, str]], 
+                messages: List[Dict[str, Any]], 
                 tools: Optional[List[Dict[str, Any]]] = None,
                 tool_choice: str = "auto") -> Dict[str, Any]:
         """Make a call to the LLM with proper error handling."""
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4",  # Use the default model unless specified otherwise
                 messages=messages,
                 tools=tools,
                 tool_choice=tool_choice
@@ -82,15 +82,19 @@ class BaseAgent(ABC):
                 "success": False,
                 "error": str(e)
             }
-    
-    def execute_tool(self, tool_call: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute a tool call and return the result."""
-        try:
-            # This should be implemented by child classes to handle their specific tools
-            raise NotImplementedError("Tool execution must be implemented by child classes")
-        except Exception as e:
-            self.logger.error(f"Error executing tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e)
-            } 
+
+    @abstractmethod
+    def execute_tool(self, tool_call: Any) -> Dict[str, Any]:
+        """Execute a tool call and return the result.
+
+        Args:
+            tool_call: A ChatCompletionMessageToolCall object containing the tool call details
+
+        Returns:
+            Dict containing:
+                success: bool indicating if the tool execution was successful
+                data: The result data if successful
+                error: Error message if unsuccessful
+                name: The name of the tool that was called
+        """
+        pass

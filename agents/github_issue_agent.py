@@ -87,6 +87,42 @@ class GitHubIssueAgent(BaseAgent):
             }
         ]
 
+    def execute_tool(self, tool_call: Any) -> Dict[str, Any]:
+        """Execute the specified tool call."""
+        try:
+            # Extract tool name and arguments using dot notation for ChatCompletionMessageToolCall
+            name = tool_call.function.name
+            args = json.loads(tool_call.function.arguments)
+
+            # Execute the appropriate tool function
+            if name == "search_repository":
+                # Set default empty list for file_patterns if not provided
+                args.setdefault('file_patterns', [])
+                result = search_repository(**args)
+            elif name == "read_file":
+                result = read_file(**args)
+            elif name == "create_github_issue":
+                # Set default empty list for labels if not provided
+                args.setdefault('labels', [])
+                result = create_github_issue(**args)
+            else:
+                raise ValueError(f"Unknown tool: {name}")
+
+            return {
+                "success": True,
+                "data": result,
+                "name": name
+            }
+
+        except Exception as e:
+            error_msg = str(e)
+            self.logger.error(f"Error executing tool {name if 'name' in locals() else 'unknown'}: {error_msg}")
+            return {
+                "success": False,
+                "error": error_msg,
+                "name": name if 'name' in locals() else 'unknown'
+            }
+
     def process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """Process the input request and generate a response."""
         # Initialize conversation if needed
@@ -166,40 +202,4 @@ Follow these steps:
             return {
                 "success": True,
                 "response": message.content if message.content else "Task completed successfully"
-            }
-
-    def execute_tool(self, tool_call: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute the specified tool call."""
-        try:
-            # Extract tool name and arguments
-            name = tool_call["function"]["name"]
-            args = json.loads(tool_call["function"]["arguments"])
-
-            # Execute the appropriate tool function
-            if name == "search_repository":
-                # Set default empty list for file_patterns if not provided
-                args.setdefault('file_patterns', [])
-                result = search_repository(**args)
-            elif name == "read_file":
-                result = read_file(**args)
-            elif name == "create_github_issue":
-                # Set default empty list for labels if not provided
-                args.setdefault('labels', [])
-                result = create_github_issue(**args)
-            else:
-                raise ValueError(f"Unknown tool: {name}")
-
-            return {
-                "success": True,
-                "data": result,
-                "name": name
-            }
-
-        except Exception as e:
-            error_msg = str(e)
-            self.logger.error(f"Error executing tool {name if 'name' in locals() else 'unknown'}: {error_msg}")
-            return {
-                "success": False,
-                "error": error_msg,
-                "name": name if 'name' in locals() else 'unknown'
             }
