@@ -5,7 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertDiv = resultDiv.querySelector('.alert');
     const toggleTokenBtn = document.getElementById('toggleToken');
     const tokenInput = document.getElementById('githubToken');
+    const saveTokenBtn = document.getElementById('saveToken');
+    const clearTokenBtn = document.getElementById('clearToken');
+    const tokenAlert = document.getElementById('tokenAlert');
     let eventSource = null;
+
+    // Initialize token state
+    updateTokenState();
 
     // Token visibility toggle
     toggleTokenBtn.addEventListener('click', function() {
@@ -13,6 +19,74 @@ document.addEventListener('DOMContentLoaded', function() {
         tokenInput.type = type;
         toggleTokenBtn.innerHTML = `<i class="bi bi-eye${type === 'password' ? '' : '-slash'}"></i>`;
     });
+
+    // Token management
+    function updateTokenState() {
+        const hasToken = tokenInput.value.trim() !== '';
+        clearTokenBtn.style.display = hasToken ? 'inline-block' : 'none';
+        saveTokenBtn.innerHTML = hasToken ? 
+            '<i class="bi bi-check-circle me-1"></i>Update Token' : 
+            '<i class="bi bi-check-circle me-1"></i>Save Token';
+    }
+
+    function showTokenAlert(message, type = 'success') {
+        tokenAlert.className = `alert alert-${type}`;
+        tokenAlert.innerHTML = `
+            <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+        `;
+        tokenAlert.style.display = 'block';
+        setTimeout(() => {
+            tokenAlert.style.display = 'none';
+        }, 3000);
+    }
+
+    saveTokenBtn.addEventListener('click', async function() {
+        const token = tokenInput.value.trim();
+        if (!token) {
+            showTokenAlert('Please enter a GitHub token', 'danger');
+            return;
+        }
+
+        try {
+            const response = await fetch('/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                showTokenAlert(data.message);
+                updateTokenState();
+            } else {
+                showTokenAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showTokenAlert('Failed to save token', 'danger');
+        }
+    });
+
+    clearTokenBtn.addEventListener('click', async function() {
+        try {
+            const response = await fetch('/token', {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                tokenInput.value = '';
+                updateTokenState();
+                showTokenAlert(data.message);
+            }
+        } catch (error) {
+            showTokenAlert('Failed to clear token', 'danger');
+        }
+    });
+
+    tokenInput.addEventListener('input', updateTokenState);
 
     // Create progress container
     const progressContainer = document.createElement('div');

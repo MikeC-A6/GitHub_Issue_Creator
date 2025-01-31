@@ -3,6 +3,44 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
+        <!-- Token Management Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>GitHub Token</h4>
+                <div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="clearToken" style="display: none;">
+                        <i class="bi bi-trash me-1"></i>Clear Token
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="token-form mb-0">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="githubToken" 
+                               placeholder="Enter your GitHub Personal Access Token"
+                               value="{{ github_token }}"
+                               required>
+                        <button class="btn btn-outline-secondary" type="button" id="toggleToken" 
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-primary" type="button" id="saveToken">
+                            <i class="bi bi-check-circle me-1"></i>Save Token
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Your token needs permissions for creating issues. It will be stored securely in your session.
+                        <a href="https://github.com/settings/tokens" target="_blank" class="ms-1">
+                            Get a token <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="tokenAlert" class="alert mt-3" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Issue Creation Form -->
         <div class="card">
             <div class="card-header">
                 <h4>Create GitHub Issue</h4>
@@ -37,23 +75,6 @@
                         <div class="form-text">
                             <i class="bi bi-info-circle me-1"></i>
                             Upload a text file containing relevant code context to help create a more detailed issue
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="githubToken" class="form-label">
-                            <i class="bi bi-key me-2"></i>GitHub Personal Access Token
-                        </label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="githubToken" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggleToken" 
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        <div class="form-text">
-                            <i class="bi bi-shield-check me-1"></i>
-                            Your token needs permissions for creating issues. It will not be stored.
                         </div>
                     </div>
 

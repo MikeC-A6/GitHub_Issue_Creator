@@ -4,8 +4,8 @@ import json
 import queue
 import threading
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, jsonify, Response, stream_with_context
-from utils.github import create_github_issue
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context, session
+from utils.github import create_github_issue, validate_github_token
 from utils.gemini_helper import process_issue_description
 
 # Configure logging
@@ -13,7 +13,11 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+# Use a strong secret key in production
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default_secret_key")
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
 # Store progress updates for each session
 progress_queues = {}
@@ -34,7 +38,41 @@ def cleanup_old_sessions():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', github_token=session.get('github_token', ''))
+
+@app.route('/token', methods=['POST'])
+def save_token():
+    """Save or validate the GitHub token"""
+    token = request.json.get('token')
+    if not token:
+        session.pop('github_token', None)
+        return jsonify({'status': 'success', 'message': 'Token cleared'})
+    
+    try:
+        # Validate the token before saving
+        if validate_github_token(token):
+            session['github_token'] = token
+            return jsonify({
+                'status': 'success',
+                'message': 'Token saved successfully'
+            })
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid GitHub token'
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating token: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Error validating token'
+        }), 400
+
+@app.route('/token', methods=['DELETE'])
+def clear_token():
+    """Clear the stored GitHub token"""
+    session.pop('github_token', None)
+    return jsonify({'status': 'success', 'message': 'Token cleared'})
 
 def send_progress_update(session_id, step, error=None, complete=False):
     """Send a progress update to the client"""
@@ -80,12 +118,19 @@ def create_issue():
         session_id = data.get('session_id')
         repo_url = data.get('repo_url')
         description = data.get('description')
-        github_token = data.get('github_token')
+        github_token = data.get('github_token') or session.get('github_token')
         code_context = data.get('code_context', '')
 
-        if not all([repo_url, description, github_token]):
+        if not all([repo_url, description]):
             return jsonify({
                 'error': 'Missing required fields',
+                'step': 'validation',
+                'status': 'error'
+            }), 400
+
+        if not github_token:
+            return jsonify({
+                'error': 'GitHub token is required',
                 'step': 'validation',
                 'status': 'error'
             }), 400

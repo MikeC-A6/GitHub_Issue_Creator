@@ -5,6 +5,40 @@ from .openai_helper import generate_github_graphql_query
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
+def validate_github_token(token):
+    """
+    Validate a GitHub token by making a test GraphQL query.
+    Returns True if the token is valid, False otherwise.
+    """
+    headers = {
+        "Authorization": f"bearer {token}",
+        "Content-Type": "application/json",
+    }
+    
+    # Simple query to check if the token is valid and has the required permissions
+    query = """
+    query {
+        viewer {
+            login
+        }
+    }
+    """
+    
+    try:
+        response = requests.post(
+            GITHUB_GRAPHQL_URL,
+            headers=headers,
+            json={"query": query}
+        )
+        
+        if response.status_code != 200:
+            return False
+            
+        data = response.json()
+        return "data" in data and "viewer" in data["data"] and "login" in data["data"]["viewer"]
+    except Exception:
+        return False
+
 def get_schema_info(token, type_name=None):
     """Get GraphQL schema information using introspection."""
     headers = {
