@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertDiv = resultDiv.querySelector('.alert');
     const toggleTokenBtn = document.getElementById('toggleToken');
     const tokenInput = document.getElementById('githubToken');
+    let eventSource = null;
 
     // Token visibility toggle
     toggleTokenBtn.addEventListener('click', function() {
@@ -20,37 +21,104 @@ document.addEventListener('DOMContentLoaded', function() {
     resultDiv.parentNode.insertBefore(progressContainer, resultDiv);
 
     const steps = {
-        'processing_description': 'Processing Description...',
-        'generating_query': 'Generating GraphQL Query...',
-        'fetching_repo': 'Fetching Repository ID...',
-        'submitting_issue': 'Submitting Issue...',
-        'completed': 'Issue Created!'
+        'processing_description': {
+            message: 'Processing Description...',
+            progress: 20,
+            icon: 'chat-text'
+        },
+        'generating_query': {
+            message: 'Generating GraphQL Query...',
+            progress: 40,
+            icon: 'code-square'
+        },
+        'fetching_repo': {
+            message: 'Fetching Repository ID...',
+            progress: 60,
+            icon: 'git'
+        },
+        'submitting_issue': {
+            message: 'Submitting Issue...',
+            progress: 80,
+            icon: 'arrow-up-circle'
+        },
+        'completed': {
+            message: 'Issue Created!',
+            progress: 100,
+            icon: 'check-circle'
+        }
     };
 
     function updateProgress(step, error = null) {
         progressContainer.style.display = 'block';
-        let statusClass = error ? 'text-danger' : 'text-primary';
-        let message = error ? `Error: ${error}` : (steps[step] || step);
-        let icon = error ? 'exclamation-circle' : 'arrow-right-circle';
+        let stepInfo = steps[step] || { 
+            message: step,
+            progress: 0,
+            icon: 'question-circle'
+        };
         
+        let statusClass = error ? 'text-danger' : 'text-primary';
+        let message = error ? `Error: ${error}` : stepInfo.message;
+        let icon = error ? 'exclamation-circle' : stepInfo.icon;
+        let progress = error ? stepInfo.progress : stepInfo.progress;
+        
+        // Update button state
         submitButton.innerHTML = `
             <span class="spinner-border spinner-border-sm ${error ? 'd-none' : ''}" role="status" aria-hidden="true"></span>
             <i class="bi bi-${icon} ${error ? '' : 'd-none'}"></i>
             ${message}
         `;
         
-        // Update progress container
-        progressContainer.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="progress flex-grow-1 mx-2">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                         style="width: ${step === 'completed' ? '100' : '75'}%"></div>
+        // Update progress container with step list
+        let stepsHtml = Object.entries(steps).map(([key, info]) => {
+            let stepClass = '';
+            if (key === step) {
+                stepClass = error ? 'text-danger fw-bold' : 'text-primary fw-bold';
+            } else if (getStepOrder(key) < getStepOrder(step)) {
+                stepClass = 'text-success';
+            } else {
+                stepClass = 'text-muted';
+            }
+            
+            return `
+                <div class="step-item ${stepClass}">
+                    <i class="bi bi-${key === step ? icon : info.icon} me-2"></i>
+                    ${info.message}
                 </div>
-                <span class="${statusClass}">
+            `;
+        }).join('');
+        
+        progressContainer.innerHTML = `
+            <div class="steps-container mb-3">
+                ${stepsHtml}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="progress flex-grow-1">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         style="width: ${progress}%"></div>
+                </div>
+                <span class="${statusClass} ms-3">
                     <i class="bi bi-${icon} me-2"></i>${message}
                 </span>
             </div>
         `;
+    }
+
+    function getStepOrder(step) {
+        const order = {
+            'processing_description': 1,
+            'generating_query': 2,
+            'fetching_repo': 3,
+            'submitting_issue': 4,
+            'completed': 5
+        };
+        return order[step] || 0;
+    }
+
+    function cleanupEventSource() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+        }
     }
 
     form.addEventListener('submit', async function(e) {
@@ -59,8 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset and show loading state
         submitButton.disabled = true;
         resultDiv.style.display = 'none';
+        alertDiv.style.display = 'none';
         progressContainer.style.display = 'block';
-        updateProgress('processing_description');
+        
+        // Clean up any existing event source
+        cleanupEventSource();
 
         try {
             let codeContext = '';
@@ -70,12 +141,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 codeContext = await codebaseFile.text();
             }
 
+            // Generate a unique session ID for this submission
+            const sessionId = Date.now().toString();
+
+            // Set up SSE connection first
+            eventSource = new EventSource(`/progress/${sessionId}`);
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.step) {
+                    updateProgress(data.step, data.error);
+                }
+                if (data.complete || data.error) {
+                    cleanupEventSource();
+                }
+            };
+
+            eventSource.onerror = function() {
+                cleanupEventSource();
+            };
+
+            // Start with processing description
+            updateProgress('processing_description');
+
             const response = await fetch('/create_issue', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    session_id: sessionId,
                     repo_url: document.getElementById('repoUrl').value,
                     description: document.getElementById('description').value,
                     github_token: document.getElementById('githubToken').value,
@@ -123,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Create Issue';
             resultDiv.style.display = 'block';
             alertDiv.style.display = 'block';
+            cleanupEventSource();
         }
     });
 
