@@ -47,7 +47,7 @@ Description: {description}
 {context_prompt}"""
 
         # Generate content using Gemini
-        model = genai.GenerativeModel("gemini-1.0-pro")
+        model = genai.GenerativeModel("gemini-2.0-flash-exp")
         response = model.generate_content(prompt)
 
         # Get the text content of the response
