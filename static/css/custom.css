@@ -1,21 +1,63 @@
-/* Custom styles to complement Bootstrap dark theme */
+/* Theme variables */
 :root {
+    /* Shared variables */
     --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    --card-bg: rgba(30, 32, 47, 0.98);
-    --input-bg: rgba(17, 18, 23, 0.95);
-    --hover-bg: rgba(255, 255, 255, 0.03);
+    --primary-color: #6366f1;
+    --success-color: #10B981;
+    --danger-color: #EF4444;
+    
+    /* Light theme variables */
+    --light-card-bg: rgba(255, 255, 255, 0.98);
+    --light-input-bg: rgba(249, 250, 251, 0.95);
+    --light-navbar-bg: rgba(255, 255, 255, 0.8);
+    --light-border-color: rgba(0, 0, 0, 0.1);
+    --light-text-color: #1F2937;
+    --light-text-muted: #6B7280;
+    --light-hover-bg: rgba(0, 0, 0, 0.03);
+    
+    /* Dark theme variables */
+    --dark-card-bg: rgba(30, 32, 47, 0.98);
+    --dark-input-bg: rgba(17, 18, 23, 0.95);
+    --dark-navbar-bg: rgba(17, 18, 23, 0.8);
+    --dark-border-color: rgba(255, 255, 255, 0.1);
+    --dark-text-color: rgba(255, 255, 255, 0.9);
+    --dark-text-muted: rgba(255, 255, 255, 0.5);
+    --dark-hover-bg: rgba(255, 255, 255, 0.03);
 }
 
+/* Theme-specific styles */
+[data-bs-theme="light"] {
+    --card-bg: var(--light-card-bg);
+    --input-bg: var(--light-input-bg);
+    --navbar-bg: var(--light-navbar-bg);
+    --border-color: var(--light-border-color);
+    --text-color: var(--light-text-color);
+    --text-muted: var(--light-text-muted);
+    --hover-bg: var(--light-hover-bg);
+}
+
+[data-bs-theme="dark"] {
+    --card-bg: var(--dark-card-bg);
+    --input-bg: var(--dark-input-bg);
+    --navbar-bg: var(--dark-navbar-bg);
+    --border-color: var(--dark-border-color);
+    --text-color: var(--dark-text-color);
+    --text-muted: var(--dark-text-muted);
+    --hover-bg: var(--dark-hover-bg);
+}
+
+/* Base styles */
 body {
     background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 40%),
                 radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.1), transparent 40%);
     min-height: 100vh;
+    color: var(--text-color);
 }
 
 .navbar {
     backdrop-filter: blur(10px);
-    background: rgba(17, 18, 23, 0.8) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--navbar-bg) !important;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .navbar-brand {
@@ -31,22 +73,42 @@ body {
     -webkit-text-fill-color: initial;
 }
 
+/* Theme toggle button */
+.theme-toggle {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-color);
+    margin-right: 1rem;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--hover-bg);
+}
+
+.theme-toggle i {
+    font-size: 1.1rem;
+}
+
+/* Card styles */
 .card {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     background: var(--card-bg);
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
     background: var(--input-bg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-color);
     padding: 1.25rem 1.5rem;
 }
 
@@ -64,17 +126,18 @@ body {
     padding: 1.5rem;
 }
 
+/* Form styles */
 .form-control {
     background: var(--input-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     padding: 0.75rem 1rem;
-    color: #fff;
+    color: var(--text-color);
     transition: all 0.2s ease;
 }
 
 .form-control:focus {
     background: var(--input-bg);
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
@@ -86,15 +149,16 @@ textarea.form-control {
 .form-label {
     font-weight: 500;
     margin-bottom: 0.5rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-color);
 }
 
 .form-text {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
     font-size: 0.875rem;
     margin-top: 0.5rem;
 }
 
+/* Button styles */
 .btn-primary {
     background: var(--primary-gradient);
     border: none;
@@ -112,16 +176,17 @@ textarea.form-control {
     transform: translateY(0);
 }
 
+/* Progress styles */
 .progress-container {
     background: var(--input-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 1rem;
     margin-bottom: 1rem;
 }
 
 .progress {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--hover-bg);
     height: 4px !important;
     border-radius: 2px;
 }
@@ -130,74 +195,62 @@ textarea.form-control {
     background: var(--primary-gradient);
 }
 
+/* Alert styles */
 .alert {
     display: none;
     border: none;
     background: var(--input-bg);
     backdrop-filter: blur(10px);
     padding: 1rem 1.25rem;
+    color: var(--text-color);
 }
 
 .alert-success {
-    border-left: 4px solid #10B981;
+    border-left: 4px solid var(--success-color);
 }
 
 .alert-danger {
-    border-left: 4px solid #EF4444;
+    border-left: 4px solid var(--danger-color);
 }
 
 .alert h5 {
-    color: #fff;
+    color: var(--text-color);
     margin-bottom: 0.5rem;
 }
 
-.btn-outline-success {
-    border-color: #10B981;
-    color: #10B981;
-}
-
-.btn-outline-success:hover {
-    background: #10B981;
-    color: #fff;
-}
-
+/* Footer styles */
 .footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: rgba(17, 18, 23, 0.8);
+    background: var(--navbar-bg);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-color);
     padding: 1rem 0;
 }
 
 .footer .text-muted {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-main {
-    margin-bottom: 100px;
-    padding: 2rem 0;
+    color: var(--text-muted) !important;
 }
 
 /* Form validation styles */
 .form-control.is-invalid {
-    border-color: #EF4444;
+    border-color: var(--danger-color);
     background-image: none;
 }
 
 .form-control.is-valid {
-    border-color: #10B981;
+    border-color: var(--success-color);
     background-image: none;
 }
 
 .form-control.is-invalid:focus {
-    border-color: #EF4444;
+    border-color: var(--danger-color);
     box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
 .form-control.is-valid:focus {
-    border-color: #10B981;
+    border-color: var(--success-color);
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
