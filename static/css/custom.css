@@ -1,12 +1,81 @@
 /* Custom styles to complement Bootstrap dark theme */
+:root {
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --card-bg: rgba(30, 32, 47, 0.98);
+    --input-bg: rgba(17, 18, 23, 0.95);
+    --hover-bg: rgba(255, 255, 255, 0.03);
+}
+
+body {
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.1), transparent 40%);
+    min-height: 100vh;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background: rgba(17, 18, 23, 0.8) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-brand i {
+    background: inherit;
+    -webkit-text-fill-color: initial;
+}
+
 .card {
-    border-color: var(--bs-dark);
-    background-color: var(--bs-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .card-header {
-    background-color: rgba(255, 255, 255, 0.05);
+    background: var(--input-bg);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-header h4 {
+    font-weight: 600;
+    margin: 0;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-control {
+    background: var(--input-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    background: var(--input-bg);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 textarea.form-control {
@@ -14,23 +83,135 @@ textarea.form-control {
     min-height: 150px;
 }
 
-.form-control:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.progress-container {
+    background: var(--input-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.progress {
+    background: rgba(255, 255, 255, 0.05);
+    height: 4px !important;
+    border-radius: 2px;
+}
+
+.progress-bar {
+    background: var(--primary-gradient);
 }
 
 .alert {
     display: none;
+    border: none;
+    background: var(--input-bg);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.25rem;
+}
+
+.alert-success {
+    border-left: 4px solid #10B981;
+}
+
+.alert-danger {
+    border-left: 4px solid #EF4444;
+}
+
+.alert h5 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.btn-outline-success {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.btn-outline-success:hover {
+    background: #10B981;
+    color: #fff;
 }
 
 .footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: var(--bs-dark);
+    background: rgba(17, 18, 23, 0.8);
+    backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.footer .text-muted {
+    color: rgba(255, 255, 255, 0.5) !important;
 }
 
 main {
     margin-bottom: 100px;
+    padding: 2rem 0;
+}
+
+/* Form validation styles */
+.form-control.is-invalid {
+    border-color: #EF4444;
+    background-image: none;
+}
+
+.form-control.is-valid {
+    border-color: #10B981;
+    background-image: none;
+}
+
+.form-control.is-invalid:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.form-control.is-valid:focus {
+    border-color: #10B981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin: 0 1rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    main {
+        padding: 1rem 0;
+    }
 }

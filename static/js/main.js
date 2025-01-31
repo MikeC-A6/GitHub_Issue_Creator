@@ -3,6 +3,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
     const resultDiv = document.getElementById('result');
     const alertDiv = resultDiv.querySelector('.alert');
+    const toggleTokenBtn = document.getElementById('toggleToken');
+    const tokenInput = document.getElementById('githubToken');
+
+    // Token visibility toggle
+    toggleTokenBtn.addEventListener('click', function() {
+        const type = tokenInput.type === 'password' ? 'text' : 'password';
+        tokenInput.type = type;
+        toggleTokenBtn.innerHTML = `<i class="bi bi-eye${type === 'password' ? '' : '-slash'}"></i>`;
+    });
 
     // Create progress container
     const progressContainer = document.createElement('div');
@@ -22,16 +31,24 @@ document.addEventListener('DOMContentLoaded', function() {
         progressContainer.style.display = 'block';
         let statusClass = error ? 'text-danger' : 'text-primary';
         let message = error ? `Error: ${error}` : (steps[step] || step);
+        let icon = error ? 'exclamation-circle' : 'arrow-right-circle';
         
-        submitButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${message}`;
+        submitButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm ${error ? 'd-none' : ''}" role="status" aria-hidden="true"></span>
+            <i class="bi bi-${icon} ${error ? '' : 'd-none'}"></i>
+            ${message}
+        `;
         
         // Update progress container
         progressContainer.innerHTML = `
             <div class="d-flex justify-content-between align-items-center">
-                <div class="progress flex-grow-1 mx-2" style="height: 2px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: ${step === 'completed' ? '100' : '75'}%"></div>
+                <div class="progress flex-grow-1 mx-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         style="width: ${step === 'completed' ? '100' : '75'}%"></div>
                 </div>
-                <span class="${statusClass}">${message}</span>
+                <span class="${statusClass}">
+                    <i class="bi bi-${icon} me-2"></i>${message}
+                </span>
             </div>
         `;
     }
@@ -75,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show success message
                 alertDiv.className = 'alert alert-success';
                 alertDiv.innerHTML = `
-                    <h5>Issue Created Successfully!</h5>
+                    <h5><i class="bi bi-check-circle me-2"></i>Issue Created Successfully!</h5>
                     <p>Your issue has been created. You can view it here:</p>
                     <a href="${data.url}" target="_blank" class="btn btn-outline-success">
-                        View Issue #${data.number}
+                        <i class="bi bi-box-arrow-up-right me-2"></i>View Issue #${data.number}
                     </a>
                 `;
                 form.reset();
@@ -87,35 +104,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateProgress(data.step || 'unknown', data.error);
                 alertDiv.className = 'alert alert-danger';
                 alertDiv.innerHTML = `
-                    <h5>Error Creating Issue</h5>
+                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Error Creating Issue</h5>
                     <p>${data.error}</p>
-                    ${data.details ? `<p><small class="text-muted">Details: ${data.details}</small></p>` : ''}
+                    ${data.details ? `<p><small class="text-muted"><i class="bi bi-info-circle me-1"></i>Details: ${data.details}</small></p>` : ''}
                 `;
             }
         } catch (error) {
             // Show error message
             updateProgress('unknown', 'An unexpected error occurred');
             alertDiv.className = 'alert alert-danger';
-            alertDiv.textContent = 'An error occurred while creating the issue.';
+            alertDiv.innerHTML = `
+                <h5><i class="bi bi-exclamation-triangle me-2"></i>Error</h5>
+                <p>An error occurred while creating the issue.</p>
+            `;
         } finally {
             // Reset button state but keep progress visible
             submitButton.disabled = false;
-            submitButton.textContent = 'Create Issue';
+            submitButton.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Create Issue';
             resultDiv.style.display = 'block';
             alertDiv.style.display = 'block';
         }
     });
 
-    // Real-time validation
+    // Real-time validation with improved feedback
     const repoUrlInput = document.getElementById('repoUrl');
     repoUrlInput.addEventListener('input', function() {
         const isValid = /^https:\/\/github\.com\/[\w-]+\/[\w-]+\/?$/.test(this.value);
-        if (isValid) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-        } else {
-            this.classList.remove('is-valid');
-            this.classList.add('is-invalid');
+        this.classList.remove('is-invalid', 'is-valid');
+        if (this.value) {
+            this.classList.add(isValid ? 'is-valid' : 'is-invalid');
+            
+            // Update feedback message
+            let feedback = this.parentElement.querySelector('.invalid-feedback');
+            if (!feedback && !isValid) {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                this.parentElement.appendChild(feedback);
+            }
+            if (feedback) {
+                feedback.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo)';
+            }
         }
     });
 });

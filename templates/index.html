@@ -5,42 +5,63 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0">Create GitHub Issue</h4>
+                <h4>Create GitHub Issue</h4>
             </div>
             <div class="card-body">
                 <form id="issueForm">
-                    <div class="mb-3">
-                        <label for="repoUrl" class="form-label">GitHub Repository URL</label>
+                    <div class="mb-4">
+                        <label for="repoUrl" class="form-label">
+                            <i class="bi bi-git me-2"></i>GitHub Repository URL
+                        </label>
                         <input type="url" class="form-control" id="repoUrl" required
                                placeholder="https://github.com/owner/repository">
-                        <div class="form-text">Enter the full URL of the GitHub repository</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Issue Description</label>
-                        <textarea class="form-control" id="description" rows="6" required
-                                  placeholder="Describe the issue in detail. Our AI will format it appropriately."></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="codebaseFile" class="form-label">Codebase Context (Optional)</label>
-                        <input type="file" class="form-control" id="codebaseFile" accept=".txt">
                         <div class="form-text">
-                            Upload a text file containing relevant code context to help create a more detailed issue.
+                            <i class="bi bi-info-circle me-1"></i>
+                            Enter the full URL of the GitHub repository where you want to create the issue
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="githubToken" class="form-label">GitHub Personal Access Token</label>
-                        <input type="password" class="form-control" id="githubToken" required>
+                    <div class="mb-4">
+                        <label for="description" class="form-label">
+                            <i class="bi bi-chat-text me-2"></i>Issue Description
+                        </label>
+                        <textarea class="form-control" id="description" rows="6" required
+                                  placeholder="Describe the issue in detail. Our AI will help format it appropriately.&#10;&#10;Tips:&#10;- Be specific about the problem or feature request&#10;- Include any relevant context or background&#10;- Mention any related issues or dependencies"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="codebaseFile" class="form-label">
+                            <i class="bi bi-code-square me-2"></i>Codebase Context (Optional)
+                        </label>
+                        <input type="file" class="form-control" id="codebaseFile" accept=".txt">
                         <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Upload a text file containing relevant code context to help create a more detailed issue
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="githubToken" class="form-label">
+                            <i class="bi bi-key me-2"></i>GitHub Personal Access Token
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="githubToken" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleToken" 
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-shield-check me-1"></i>
                             Your token needs permissions for creating issues. It will not be stored.
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="submitButton">
-                        Create Issue
-                    </button>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" id="submitButton">
+                            <i class="bi bi-plus-circle me-2"></i>Create Issue
+                        </button>
+                    </div>
                 </form>
 
                 <div id="result" class="mt-4" style="display: none;">
