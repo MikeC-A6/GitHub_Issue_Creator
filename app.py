@@ -25,24 +25,51 @@ def create_issue():
         code_context = data.get('code_context', '')
 
         if not all([repo_url, description, github_token]):
-            return jsonify({'error': 'Missing required fields'}), 400
+            return jsonify({
+                'error': 'Missing required fields',
+                'step': 'validation',
+                'status': 'error'
+            }), 400
 
-        # Process the description with Gemini
-        processed_issue = process_issue_description(description, code_context)
+        try:
+            # Process the description with Gemini
+            processed_issue = process_issue_description(description, code_context)
+        except Exception as e:
+            logger.error(f"Error processing description: {str(e)}")
+            return jsonify({
+                'error': 'Failed to process issue description',
+                'step': 'processing_description',
+                'status': 'error',
+                'details': str(e)
+            }), 500
 
-        # Create the issue using GitHub GraphQL API
-        result = create_github_issue(
-            repo_url=repo_url,
-            title=processed_issue['title'],
-            body=processed_issue['body'],
-            token=github_token
-        )
-
-        return jsonify(result)
+        try:
+            # Create the issue using GitHub GraphQL API
+            result = create_github_issue(
+                repo_url=repo_url,
+                title=processed_issue['title'],
+                body=processed_issue['body'],
+                token=github_token
+            )
+            result['status'] = 'success'
+            result['step'] = 'completed'
+            return jsonify(result)
+        except Exception as e:
+            logger.error(f"Error in GitHub API call: {str(e)}")
+            return jsonify({
+                'error': 'Failed to create GitHub issue',
+                'step': 'submitting_issue',
+                'status': 'error',
+                'details': str(e)
+            }), 500
 
     except Exception as e:
-        logger.error(f"Error creating issue: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Unexpected error creating issue: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'step': 'unknown',
+            'status': 'error'
+        }), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

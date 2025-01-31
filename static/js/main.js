@@ -4,15 +4,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultDiv = document.getElementById('result');
     const alertDiv = resultDiv.querySelector('.alert');
 
+    // Create progress container
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-container mb-3';
+    progressContainer.style.display = 'none';
+    resultDiv.parentNode.insertBefore(progressContainer, resultDiv);
+
+    const steps = {
+        'processing_description': 'Processing Description...',
+        'generating_query': 'Generating GraphQL Query...',
+        'fetching_repo': 'Fetching Repository ID...',
+        'submitting_issue': 'Submitting Issue...',
+        'completed': 'Issue Created!'
+    };
+
+    function updateProgress(step, error = null) {
+        progressContainer.style.display = 'block';
+        let statusClass = error ? 'text-danger' : 'text-primary';
+        let message = error ? `Error: ${error}` : (steps[step] || step);
+        
+        submitButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${message}`;
+        
+        // Update progress container
+        progressContainer.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="progress flex-grow-1 mx-2" style="height: 2px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: ${step === 'completed' ? '100' : '75'}%"></div>
+                </div>
+                <span class="${statusClass}">${message}</span>
+            </div>
+        `;
+    }
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Show loading state
+        // Reset and show loading state
         submitButton.disabled = true;
-        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
-
-        // Hide previous results
         resultDiv.style.display = 'none';
+        progressContainer.style.display = 'block';
+        updateProgress('processing_description');
 
         try {
             let codeContext = '';
@@ -38,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
+                // Update progress to completed
+                updateProgress('completed');
+                
                 // Show success message
                 alertDiv.className = 'alert alert-success';
                 alertDiv.innerHTML = `
@@ -49,16 +83,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 form.reset();
             } else {
-                // Show error message
+                // Show error in progress and alert
+                updateProgress(data.step || 'unknown', data.error);
                 alertDiv.className = 'alert alert-danger';
-                alertDiv.textContent = data.error || 'An error occurred while creating the issue.';
+                alertDiv.innerHTML = `
+                    <h5>Error Creating Issue</h5>
+                    <p>${data.error}</p>
+                    ${data.details ? `<p><small class="text-muted">Details: ${data.details}</small></p>` : ''}
+                `;
             }
         } catch (error) {
             // Show error message
+            updateProgress('unknown', 'An unexpected error occurred');
             alertDiv.className = 'alert alert-danger';
             alertDiv.textContent = 'An error occurred while creating the issue.';
         } finally {
-            // Reset button state
+            // Reset button state but keep progress visible
             submitButton.disabled = false;
             submitButton.textContent = 'Create Issue';
             resultDiv.style.display = 'block';
