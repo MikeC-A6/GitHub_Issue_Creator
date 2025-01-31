@@ -1,5 +1,7 @@
 import os
 import google.generativeai as genai
+import json
+import re
 
 # Configure Gemini
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -38,31 +40,32 @@ IMPORTANT:
 - If code context is provided, use it to make the issue more specific and technical
 - Include relevant code snippets from the context if they help explain the issue
 - Format your response as a JSON object with two fields: "title" and "body"
+- ONLY return the JSON object, nothing else
 
 Description: {description}
 
 {context_prompt}"""
 
         # Generate content using Gemini
-        model = genai.GenerativeModel("gemini-2.0-flash-exp")
+        model = genai.GenerativeModel("gemini-1.0-pro")
         response = model.generate_content(prompt)
-        
-        # Parse and validate the response
-        content = response.text
-        
-        # Extract the JSON-like structure from the response
-        # Remove any markdown formatting if present
-        content = content.strip('`').strip()
-        if content.startswith('json'):
-            content = content[4:].strip()
-            
-        # Convert to Python dict
-        import json
-        result = json.loads(content)
-        
+
+        # Get the text content of the response
+        content = response.text.strip()
+
+        # Try to find JSON content within the response
+        json_match = re.search(r'\{[\s\S]*\}', content)
+        if not json_match:
+            raise ValueError("No valid JSON object found in response")
+
+        json_content = json_match.group()
+
+        # Parse the JSON content
+        result = json.loads(json_content)
+
         if not isinstance(result, dict) or 'title' not in result or 'body' not in result:
-            raise ValueError("Invalid response format from Gemini")
-            
+            raise ValueError("Invalid response format: missing required fields")
+
         return result
 
     except Exception as e:
